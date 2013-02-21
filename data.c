@@ -15,6 +15,7 @@ void saveData(char * processID, char * parentID, char * command, PrintOut *empty
 void initArray(int size);
 void expandArray(int curSize, int expSize);
 int checkFull();
+char *stripSyms(const char *string, const char *chars);
 
 
 void initArray(int size)
@@ -42,12 +43,17 @@ void expandArray(int curSize, int expSize)
 void saveData(char * processID, char * parentID, char * command, PrintOut *emptyArr)
 {
     char temp [1024];
+    char temp2 [1024];
+
+    strcpy(temp2, processID);
+
+    char * strippedPID = stripSyms(temp2,"()");
 
 	strcpy(emptyArr[elements].CMD, command);
     strcpy(temp,emptyArr[elements].CMD);
     temp[strlen(temp)-1] = '\0'; //remove the \n character
     strcpy(emptyArr[elements].CMD,temp);
-	emptyArr[elements].PID = atoi(processID);
+	emptyArr[elements].PID = atoi(strippedPID);
 	emptyArr[elements].PPID = atoi(parentID);
     elements++;
 }
@@ -60,4 +66,19 @@ int checkFull()
   {return 0;}
 }
 
+char *stripSyms(const char *string, const char *chars)
+{
+  char * newstr = malloc(strlen(string) + 1);
+  int counter = 0;
+ 
+  for ( ; *string; string++) {
+    if (!strchr(chars, *string)) {
+      newstr[ counter ] = *string;
+      ++ counter;
+    }
+  }
+ 
+  newstr[counter] = 0;
+  return newstr;
+}
 

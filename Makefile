@@ -1,5 +1,5 @@
 
-CC=/usr/bin/gcc
+CC=gcc
 CFLAGS= -g -Wall -I.
 LINKFLAGS= -g -Wall
 
@@ -22,4 +22,7 @@ main.o: main.c data.h print.h
 
 clean:
 	rm -f *.o Main
+
+
+
 

@@ -4,6 +4,14 @@
 #include "data.h"
 #include "print.h"
 
+#ifdef __linux__
+#define SYSTEM_1
+#endif
+
+#ifdef __minix
+#define SYSTEM_2
+#endif
+
 FILE * psAux;
 int curPID;
 
@@ -12,12 +20,18 @@ void parsePsLine(char * bufLine);
 void printTabs(int numTabs);
 void printTree(int depth, int curID);
 void print(void);
+char *stripThree(char *string);
 
 void readPs(void)
 {
       char buf[1024];
+      #ifdef SYSTEM_1
+      psAux = popen("/bin/ps -aefc", "r");
+      #endif
+      #ifdef SYSTEM_2
+      psAux = popen("ps -aef", "r");
+      #endif
 
-	 psAux = popen("/bin/ps -aefc", "r");
       if (psAux)
       {
           fgets(buf, sizeof(buf), psAux);
@@ -34,27 +48,48 @@ void readPs(void)
 
 void parsePsLine(char * bufLine)
 {
-    	  char * processID;
-    	  char * parentID;
-    	  char * command;
-    	  int c = 1;
-          char * nextWordPtr;
-    	  char * buf = bufLine;
+    	  char * processID; char * parentID; char * command; char * current;
+    	  int c = 1; char * nextWordPtr; char * buf = bufLine; char * currentTemp;
+          int PID; int PPID; char tempCMD[1024];
+
+          #ifdef SYSTEM_1
+          PID = 2; PPID = 3;
+          #endif
+          #ifdef SYSTEM_2
+          PID = 3; PPID = 4; strcpy(tempCMD, bufLine);
+          #endif
 
 	      nextWordPtr = strtok(buf," ");
 
           while (nextWordPtr != NULL) {
-
-          if(c == 2)
+          current = nextWordPtr;
+          if(c == PID)
           {processID = nextWordPtr;}
-	      else if ( c == 3)
-	      {parentID = nextWordPtr;}
-	       else if ( c == 9)
-	      {command = nextWordPtr;}
+          else if ( c == PPID)
+          {parentID = nextWordPtr;}
            nextWordPtr = strtok(NULL," ");
            c++;
           }
-           saveData(processID,parentID,command,array);
+          command = current;
+          #ifdef SYSTEM_2
+          nextWordPtr = strtok(tempCMD,":");
+            
+         while(nextWordPtr != NULL){
+ 
+         currentTemp = nextWordPtr;
+         nextWordPtr = strtok(NULL,":");
+         }
+           
+          if(currentTemp != NULL)
+          {command = stripThree(currentTemp);}
+          #endif
+
+          saveData(processID,parentID,command,array);
+}
+
+char *stripThree(char *string)
+{
+    return string+3;
 }
 
 void printTabs(int numTabs)
