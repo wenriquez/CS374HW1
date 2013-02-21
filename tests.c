@@ -53,13 +53,28 @@ int testReadPs(void) {
 
 }
 
+int teststripSyms()
+{
+   char * expected = "9";
+   char * input = "(9)";
+   
+   char * actual = stripSyms(input,"()");
+
+   if(expected == input)
+   {return 0;}
+   else
+   {return 1;} // failed to strip the () characters
+
+}
+
 
 int runTests() {
 	
     int passCount = 0;
 	
-	passCount += testArrayInit();
+    passCount += testArrayInit();
     passCount += testReadPs();
+    passCount += teststripSyms();
     free(array);
  
     return passCount;

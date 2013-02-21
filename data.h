@@ -22,6 +22,7 @@ void saveData(char * processID, char * parentID, char * command, PrintOut *empty
 void initArray(int size);
 void expandArray(int curSize, int expSize);
 int checkFull();
+char *stripSyms(const char *string, const char *chars);
 
 
 
